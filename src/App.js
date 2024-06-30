@@ -9,6 +9,7 @@ import CadBasCriarAmbiente from './modules/cadastroBasico/ambientes/CadBasCriarA
 import CadBasAtualizarAmbiente from './modules/cadastroBasico/ambientes/CadBasAtualizarAmbiente';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ComponentMainNavbar from './components/ComponentMainNavbar';
 
 
 const App = () => {
