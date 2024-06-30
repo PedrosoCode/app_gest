@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const CadBasAtualizarAtivo = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     codigo_cliente: '',
     numero_serie: '',
@@ -41,6 +42,11 @@ const CadBasAtualizarAtivo = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios.put(`http://localhost:3042/api/ativos/${id}`, formData);
+  };
+
+  const handleDelete = async () => {
+    await axios.delete(`http://localhost:3042/api/ativos/${id}`);
+    navigate('/ativos');
   };
 
   return (
@@ -130,6 +136,9 @@ const CadBasAtualizarAtivo = () => {
         </Form.Group>
         <Button type="submit" className="mt-3">
           Atualizar
+        </Button>
+        <Button variant="danger" className="mt-3 ms-3" onClick={handleDelete}>
+          Deletar
         </Button>
       </Form>
     </Container>
