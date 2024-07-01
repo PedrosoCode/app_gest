@@ -13,6 +13,8 @@ import CadBasAtualizarAtivo from './modules/cadastroBasico/ativos/CadBasAtualiza
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ComponentMainNavbar from './components/ComponentMainNavbar';
+import ContasLoginCadastroUsuario from './modules/Contas/ContasLoginCadastroUsuario';
+import ContasCadastroEmpresa from './modules/Contas/ContasCadastroEmpresa';
 
 
 const App = () => {
@@ -27,6 +29,8 @@ const App = () => {
         <Route path="/ativos" element={<CadBasListaAtivo />} />
         <Route path="/ativos/criar" element={<CadBasCriarAtivo />} />
         <Route path="/ativos/atualizar/:id" element={<CadBasAtualizarAtivo />} />
+        <Route path="/contas-usuario" element={<ContasLoginCadastroUsuario />} />
+        <Route path="/contas-empresa" element={<ContasCadastroEmpresa />} />
       </Routes>
     </Router>
   );

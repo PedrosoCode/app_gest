@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
+//REVIEW - Forma de selecionar informações, mudar para combos
+
 const CadBasCriarAtivo = () => {
   const [formData, setFormData] = useState({
     codigo_cliente: '',

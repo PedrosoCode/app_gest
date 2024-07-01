@@ -14,6 +14,10 @@ const CadBasListaAtivo = () => {
     fetchAtivos();
   }, []);
 
+
+  //TODO - vincular fotos aos ativos
+  //FIXME - atualizar o metodo de delete
+
   return (
     <Container>
       <h2>Lista de Ativos</h2>
