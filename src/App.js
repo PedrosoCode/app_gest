@@ -16,6 +16,7 @@ import ComponentMainNavbar from './components/ComponentMainNavbar';
 import ContasLoginCadastroUsuario from './modules/Contas/ContasLoginCadastroUsuario';
 import ContasCadastroEmpresa from './modules/Contas/ContasCadastroEmpresa';
 
+//TODO - Variável de ambiente para o link da API ao invés de setar fixo
 
 const App = () => {
   return (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Container, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { Container, Form, Button, Modal } from 'react-bootstrap';
 
 const ContasCadastroEmpresa = () => {
   const [empresaData, setEmpresaData] = useState({
@@ -14,6 +15,8 @@ const ContasCadastroEmpresa = () => {
     telefone: '',
     email: ''
   });
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,26 +25,36 @@ const ContasCadastroEmpresa = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Adicione aqui a lógica para cadastrar a empresa, como uma chamada axios para sua API
-    await axios.post('http://localhost:3042/api/empresa', empresaData);
-    setEmpresaData({
-      nome_empresa: '',
-      is_cnpj: true,
-      documento: '',
-      endereco: '',
-      cidade: '',
-      estado: '',
-      cep: '',
-      telefone: '',
-      email: ''
-    });
+    try {
+      await axios.post('http://localhost:3042/api/empresa', empresaData);
+      setShowModal(true);
+    } catch (error) {
+      console.error('Erro ao cadastrar empresa:', error.response ? error.response.data : 'Erro desconhecido');
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    navigate('/');
   };
 
   return (
-    <Container>
+    <Container className="mt-5">
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Cadastro de Empresa bem-sucedido</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Empresa cadastrada com sucesso!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseModal}>
+            Fechar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       <h2>Cadastrar Empresa</h2>
       <Form onSubmit={handleSubmit}>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Nome da Empresa</Form.Label>
           <Form.Control
             type="text"
@@ -51,7 +64,7 @@ const ContasCadastroEmpresa = () => {
             required
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Check
             type="checkbox"
             label="É CNPJ?"
@@ -60,7 +73,7 @@ const ContasCadastroEmpresa = () => {
             onChange={handleChange}
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Documento</Form.Label>
           <Form.Control
             type="text"
@@ -70,7 +83,7 @@ const ContasCadastroEmpresa = () => {
             required
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Endereço</Form.Label>
           <Form.Control
             type="text"
@@ -79,7 +92,7 @@ const ContasCadastroEmpresa = () => {
             onChange={handleChange}
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Cidade</Form.Label>
           <Form.Control
             type="text"
@@ -88,7 +101,7 @@ const ContasCadastroEmpresa = () => {
             onChange={handleChange}
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Estado</Form.Label>
           <Form.Control
             type="text"
@@ -97,7 +110,7 @@ const ContasCadastroEmpresa = () => {
             onChange={handleChange}
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>CEP</Form.Label>
           <Form.Control
             type="text"
@@ -106,7 +119,7 @@ const ContasCadastroEmpresa = () => {
             onChange={handleChange}
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Telefone</Form.Label>
           <Form.Control
             type="text"
@@ -115,7 +128,7 @@ const ContasCadastroEmpresa = () => {
             onChange={handleChange}
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Email</Form.Label>
           <Form.Control
             type="email"

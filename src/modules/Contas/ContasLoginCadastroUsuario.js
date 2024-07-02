@@ -25,17 +25,19 @@ function ContasLoginCadastroUsuario() {
     }
   };
   
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:3042/api/auth/login', {
-        username, password
+        email: username, // Passando 'username' como 'email' na requisição
+        password
       });
       console.log('Resposta do login:', response.data);
       localStorage.setItem('token', response.data.token);
       setShowLoginModal(true); // Abrir o modal após o login bem-sucedido
     } catch (error) {
-      console.error('Erro ao logar:', error.response.data);
+      console.error('Erro ao logar:', error.response ? error.response.data : 'Erro desconhecido');
     }
   };
 
