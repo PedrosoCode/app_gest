@@ -16,6 +16,9 @@ import ComponentMainNavbar from './components/ComponentMainNavbar';
 import ContasLoginCadastroUsuario from './modules/Contas/ContasLoginCadastroUsuario';
 import ContasCadastroEmpresa from './modules/Contas/ContasCadastroEmpresa';
 
+import PaginaProtegida from './components/test/PaginaProtegida';
+import RotaProtegida from './components/RotaProtegida';
+
 //TODO - Variável de ambiente para o link da API ao invés de setar fixo
 
 const App = () => {
@@ -32,6 +35,7 @@ const App = () => {
         <Route path="/ativos/atualizar/:id" element={<CadBasAtualizarAtivo />} />
         <Route path="/contas-usuario" element={<ContasLoginCadastroUsuario />} />
         <Route path="/contas-empresa" element={<ContasCadastroEmpresa />} />
+        <Route path="/protected" element={<RotaProtegida> <PaginaProtegida /> </RotaProtegida>} />
       </Routes>
     </Router>
   );
