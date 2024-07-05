@@ -19,6 +19,8 @@ import ContasCadastroEmpresa from './modules/Contas/ContasCadastroEmpresa';
 import PaginaProtegida from './components/test/PaginaProtegida';
 import RotaProtegida from './components/RotaProtegida';
 
+import CadBasParceiroNegocioLista from './modules/cadastroBasico/parceiro_negocio/CadBasParceiroNegocioLista';
+
 //TODO - Variável de ambiente para o link da API ao invés de setar fixo
 
 const App = () => {
@@ -36,6 +38,7 @@ const App = () => {
         <Route path="/contas-usuario" element={<ContasLoginCadastroUsuario />} />
         <Route path="/contas-empresa" element={<ContasCadastroEmpresa />} />
         <Route path="/protected" element={<RotaProtegida> <PaginaProtegida /> </RotaProtegida>} />
+        <Route path="/parceiro-lista" element={<CadBasParceiroNegocioLista />} />
       </Routes>
     </Router>
   );
