@@ -26,6 +26,7 @@ import CadBasParceiroNegocioLista from './modules/cadastroBasico/parceiro_negoci
 const App = () => {
   return (
     <Router>
+      <ComponentMainNavbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/sobre" element={<Sobre />} />
