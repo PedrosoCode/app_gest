@@ -12,10 +12,12 @@ function ContasLoginCadastroUsuario() {
   const [showLoginModal, setShowLoginModal] = useState(false); // Estado para controlar a visibilidade do modal de login
   const navigate = useNavigate();
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3042/api/auth/signup', {
+      const response = await axios.post(`${API_URL}/auth/signup`, {
         username, email, password
       });
       console.log('Resposta do cadastro:', response.data);
@@ -29,7 +31,7 @@ function ContasLoginCadastroUsuario() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3042/api/auth/login', {
+      const response = await axios.post(`${API_URL}/auth/login`, {
         email: username, // Passando 'username' como 'email' na requisição
         password
       });

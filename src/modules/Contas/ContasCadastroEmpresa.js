@@ -26,7 +26,7 @@ const ContasCadastroEmpresa = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3042/api/empresa', empresaData);
+      await axios.post('${process.env.REACT_APP_API_URL}/empresa', empresaData);
       setShowModal(true);
     } catch (error) {
       console.error('Erro ao cadastrar empresa:', error.response ? error.response.data : 'Erro desconhecido');
