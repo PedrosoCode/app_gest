@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
-
-//REVIEW - Forma de selecionar informações, mudar para combos
 
 const CadBasCriarAtivo = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +14,21 @@ const CadBasCriarAtivo = () => {
     nivel_manutencao: false,
     codigo_empresa: ''
   });
+
+  const [tecnicos, setTecnicos] = useState([]);
+
+  useEffect(() => {
+    const fetchTecnicos = async () => {
+      try {
+        const response = await axios.get('http://localhost:3042/api/tecnicos');
+        setTecnicos(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar técnicos:', error);
+      }
+    };
+
+    fetchTecnicos();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -93,11 +106,18 @@ const CadBasCriarAtivo = () => {
         <Form.Group>
           <Form.Label>Código do Técnico Responsável</Form.Label>
           <Form.Control
-            type="text"
+            as="select"
             name="codigo_tecnico_responsavel"
             value={formData.codigo_tecnico_responsavel}
             onChange={handleChange}
-          />
+          >
+            <option value="">Selecione um técnico</option>
+            {tecnicos.map((tecnico) => (
+              <option key={tecnico.codigo} value={tecnico.codigo}>
+                {tecnico.nome}
+              </option>
+            ))}
+          </Form.Control>
         </Form.Group>
         <Form.Group>
           <Form.Label>Observação</Form.Label>
