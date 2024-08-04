@@ -8,7 +8,7 @@ const CadBasCriarAtivo = () => {
     numero_serie: '',
     codigo_fabricante: '',
     modelo: '',
-    codigo_prioridade: '',
+    codigo_prioridade: 0,
     codigo_tecnico_responsavel: '',
     observacao: '',
     nivel_manutencao: false,
@@ -16,6 +16,7 @@ const CadBasCriarAtivo = () => {
   });
 
   const [tecnicos, setTecnicos] = useState([]);
+  const [prioridades, setPrioridades] = useState([]);
 
   useEffect(() => {
     const fetchTecnicos = async () => {
@@ -26,8 +27,19 @@ const CadBasCriarAtivo = () => {
         console.error('Erro ao buscar técnicos:', error);
       }
     };
-
     fetchTecnicos();
+  }, []);
+
+  useEffect(() => {
+    const fetchPrioridades = async () => {
+      try {
+        const response = await axios.get('http://localhost:3042/api/ativos-prioridade');
+        setPrioridades(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar prioridades:', error);
+      }
+    };
+    fetchPrioridades();
   }, []);
 
   const handleChange = (e) => {
@@ -40,18 +52,22 @@ const CadBasCriarAtivo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await axios.post('http://localhost:3042/api/ativos', formData);
-    setFormData({
-      codigo_cliente: '',
-      numero_serie: '',
-      codigo_fabricante: '',
-      modelo: '',
-      codigo_prioridade: '',
-      codigo_tecnico_responsavel: '',
-      observacao: '',
-      nivel_manutencao: false,
-      codigo_empresa: ''
-    });
+    try {
+      await axios.post('http://localhost:3042/api/ativos', formData);
+      setFormData({
+        codigo_cliente: '',
+        numero_serie: '',
+        codigo_fabricante: '',
+        modelo: '',
+        codigo_prioridade: '',
+        codigo_tecnico_responsavel: '',
+        observacao: '',
+        nivel_manutencao: false,
+        codigo_empresa: ''
+      });
+    } catch (error) {
+      console.error('Erro ao criar ativo:', error);
+    }
   };
 
   return (
@@ -95,16 +111,23 @@ const CadBasCriarAtivo = () => {
           />
         </Form.Group>
         <Form.Group>
-          <Form.Label>Código de Prioridade</Form.Label>
+          <Form.Label>Nível de Prioridade</Form.Label>
           <Form.Control
-            type="text"
+            as="select"
             name="codigo_prioridade"
             value={formData.codigo_prioridade}
             onChange={handleChange}
-          />
+          >
+            <option value="">Selecione o nível de prioridade</option>
+            {prioridades.map((prioridade) => (
+              <option key={prioridade.res_codigo} value={prioridade.res_codigo}>
+                {prioridade.res_nivel}
+              </option>
+            ))}
+          </Form.Control>
         </Form.Group>
         <Form.Group>
-          <Form.Label>Código do Técnico Responsável</Form.Label>
+          <Form.Label>Técnico Responsável</Form.Label>
           <Form.Control
             as="select"
             name="codigo_tecnico_responsavel"
