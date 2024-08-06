@@ -20,6 +20,7 @@ import PaginaProtegida from './components/test/PaginaProtegida';
 import RotaProtegida from './components/RotaProtegida';
 
 import CadBasParceiroNegocioLista from './modules/cadastroBasico/parceiro_negocio/CadBasParceiroNegocioLista';
+import Teste from './modules/paginasCapa/Teste';
 
 //TODO - Variável de ambiente para o link da API ao invés de setar fixo
 
@@ -30,6 +31,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/sobre" element={<Sobre />} />
+        <Route path="/teste" element={<Teste />} />
         <Route path="/ambientes" element={<CadBasListaAmbiente />} />
         <Route path="/ambientes/criar" element={<CadBasCriarAmbiente />} />
         <Route path="/ambientes/atualizar/:id" element={<CadBasAtualizarAmbiente />} />
