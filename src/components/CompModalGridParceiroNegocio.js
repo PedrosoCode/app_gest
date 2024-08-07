@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Button, Modal, Form, InputGroup } from 'react-bootstrap';
-import { AgGridReact } from 'ag-grid-react';
+import React, { useState, useEffect } from 'react';
+import { Modal, Button, TextField, IconButton } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import SearchIcon from '@mui/icons-material/Search';
 import axios from 'axios';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
-import { FaSearch } from 'react-icons/fa';
 
-const FiltrarParceirosModal = ({ show, handleClose, onSelect }) => {
+const FiltrarParceirosModal = ({ open, onClose, onSelect }) => {
   const [parceiros, setParceiros] = useState([]);
 
   const handleSearch = async () => {
@@ -19,68 +17,57 @@ const FiltrarParceirosModal = ({ show, handleClose, onSelect }) => {
   };
 
   useEffect(() => {
-    if (show) {
+    if (open) {
       handleSearch();
     }
-  }, [show]);
+  }, [open]);
 
-  const handleRowSelected = (event) => {
-    if (event.node.selected) {
-      onSelect(event.data.codigo, event.data.nome_razao_social);
-      handleClose();
-    }
+  const columns = [
+    { field: 'documento', headerName: 'Documento', width: 150 },
+    { field: 'nome_razao_social', headerName: 'Nome / Razão Social', width: 200 },
+    { field: 'estado', headerName: 'Estado', width: 100 },
+    { field: 'nome_contato', headerName: 'Contato', width: 150 },
+    { field: 'tipo_parceiro', headerName: 'Tipo Parceiro', width: 150 },
+  ];
+
+  const handleRowClick = (params) => {
+    onSelect(params.row.codigo, params.row.nome_razao_social);
+    onClose();
   };
 
-  const columnDefs = useMemo(() => [
-    { headerName: 'Documento', field: 'documento', filter: 'agTextColumnFilter' },
-    { headerName: 'Nome / Razão Social', field: 'nome_razao_social', filter: 'agTextColumnFilter' },
-    { headerName: 'Estado', field: 'estado', filter: 'agTextColumnFilter' },
-    { headerName: 'Contato', field: 'nome_contato', filter: 'agTextColumnFilter' },
-    { headerName: 'Tipo Parceiro', field: 'tipo_parceiro', filter: 'agTextColumnFilter' },
-    {
-      headerName: 'Selecionar',
-      field: 'codigo',
-      checkboxSelection: true,
-      headerCheckboxSelection: false,
-      width: 50,
-    },
-  ], []);
-
   return (
-    <Modal show={show} onHide={handleClose} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Filtrar Parceiros de Negócio</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="ag-theme-alpine" style={{ height: 400, width: '100%' }}>
-          <AgGridReact
-            rowData={parceiros}
-            columnDefs={columnDefs}
-            rowSelection="single"
-            onRowSelected={handleRowSelected}
-            domLayout='autoHeight'
+    <Modal open={open} onClose={onClose}>
+      <div style={{ padding: 20, background: 'white', margin: 'auto', marginTop: 50, borderRadius: 8, width: '80%' }}>
+        <h2>Filtrar Parceiros de Negócio</h2>
+        <div style={{ height: 400, width: '100%' }}>
+          <DataGrid
+            rows={parceiros}
+            columns={columns}
+            pageSize={5}
+            getRowId={(row) => row.codigo}
+            onRowClick={handleRowClick}
+            checkboxSelection
+            disableSelectionOnClick
           />
         </div>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
+        <Button variant="contained" color="secondary" onClick={onClose} style={{ marginTop: 10 }}>
           Fechar
         </Button>
-      </Modal.Footer>
+      </div>
     </Modal>
   );
 };
 
 const CompModalGridParceiroNegocio = ({ onSelect }) => {
-  const [showModal, setShowModal] = useState(false);
+  const [open, setOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState({ codigo: null, nome: '' });
 
   const handleOpenModal = () => {
-    setShowModal(true);
+    setOpen(true);
   };
 
   const handleCloseModal = () => {
-    setShowModal(false);
+    setOpen(false);
   };
 
   const handleSelectPartner = (codigo, nome) => {
@@ -90,20 +77,21 @@ const CompModalGridParceiroNegocio = ({ onSelect }) => {
 
   return (
     <>
-      <InputGroup className="mb-3">
-        <Form.Control
-          type="text"
-          placeholder="Selecionar parceiro"
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <TextField
+          label="Selecionar parceiro"
           value={selectedPartner.nome}
-          readOnly
+          variant="outlined"
+          InputProps={{ readOnly: true }}
+          style={{ flex: 1 }}
         />
-        <Button variant="outline-secondary" onClick={handleOpenModal}>
-          <FaSearch />
-        </Button>
-      </InputGroup>
+        <IconButton onClick={handleOpenModal} color="primary">
+          <SearchIcon />
+        </IconButton>
+      </div>
       <FiltrarParceirosModal
-        show={showModal}
-        handleClose={handleCloseModal}
+        open={open}
+        onClose={handleCloseModal}
         onSelect={handleSelectPartner}
       />
     </>
