@@ -46,7 +46,7 @@ function ContasLoginCadastroUsuario() {
       setSignupError('');
     } catch (error) {
       console.error('Erro ao cadastrar:', error.response ? error.response.data : 'Erro desconhecido');
-      setSignupError(error.response ? error.response.data : 'Erro desconhecido');
+      setSignupError(error.response && error.response.data.message ? error.response.data.message : 'Erro desconhecido');
     }
   };
 
@@ -68,7 +68,7 @@ function ContasLoginCadastroUsuario() {
       setLoginError('');
     } catch (error) {
       console.error('Erro ao logar:', error.response ? error.response.data : 'Erro desconhecido');
-      setLoginError(error.response ? error.response.data : 'Erro desconhecido');
+      setLoginError(error.response && error.response.data.message ? error.response.data.message : 'Erro desconhecido');
     }
   };
 

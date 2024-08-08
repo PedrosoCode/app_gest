@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const RotaProtegida = ({ children }) => {
   const token = localStorage.getItem('token');
   const [estaAutenticado, setEstaAutenticado] = useState(false);
@@ -9,7 +11,7 @@ const RotaProtegida = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      axios.get('http://localhost:3042/api/autenticacao/verificarToken', {
+      axios.get(`${API_URL}/auth/verificarToken`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
