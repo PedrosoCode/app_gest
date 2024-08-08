@@ -1,4 +1,3 @@
-// src/componentes/RotaProtegida.js
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from 'axios';
@@ -16,10 +15,12 @@ const RotaProtegida = ({ children }) => {
         }
       })
       .then(response => {
+        console.log('Token verificado com sucesso:', response.data); // Log para depuração
         setEstaAutenticado(true);
         setEstaCarregando(false);
       })
-      .catch(() => {
+      .catch(error => {
+        console.error('Erro ao verificar o token:', error.response ? error.response.data : 'Erro desconhecido');
         setEstaAutenticado(false);
         setEstaCarregando(false);
       });
