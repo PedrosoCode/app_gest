@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Form, Button } from 'react-bootstrap';
+import { Container, Form, Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { FaSearch } from 'react-icons/fa';
+import './CadBasCriarAtivo.css';
+
+//FIXME - Fazer fucionar o envio para o banco 
+//TODO - Separar a lógica da grid de parceiro de negócio em um componente separado para reutilização 
+//REVIEW - Verificar uma forma de estilizar melhor a grid
 
 const CadBasCriarAtivo = () => {
   const [formData, setFormData] = useState({
@@ -12,11 +22,13 @@ const CadBasCriarAtivo = () => {
     codigo_tecnico_responsavel: '',
     observacao: '',
     nivel_manutencao: false,
-    codigo_empresa: ''
+    razao_social: ''
   });
 
   const [tecnicos, setTecnicos] = useState([]);
   const [prioridades, setPrioridades] = useState([]);
+  const [parceiros, setParceiros] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchTecnicos = async () => {
@@ -42,6 +54,18 @@ const CadBasCriarAtivo = () => {
     fetchPrioridades();
   }, []);
 
+  useEffect(() => {
+    const fetchParceiros = async () => {
+      try {
+        const response = await axios.get('http://localhost:3042/api/parceiros');
+        setParceiros(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar parceiros de negócio:', error);
+      }
+    };
+    fetchParceiros();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -52,8 +76,21 @@ const CadBasCriarAtivo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    const decodedToken = jwtDecode(token);
+    const codigo_empresa = decodedToken.codigo_empresa; // Extrair o código da empresa do JWT
+
     try {
-      await axios.post('http://localhost:3042/api/ativos', formData);
+      await axios.post('http://localhost:3042/api/ativos', {
+        ...formData,
+        codigo_empresa // Adicionar o código da empresa automaticamente
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
       setFormData({
         codigo_cliente: '',
         numero_serie: '',
@@ -63,11 +100,71 @@ const CadBasCriarAtivo = () => {
         codigo_tecnico_responsavel: '',
         observacao: '',
         nivel_manutencao: false,
-        codigo_empresa: ''
+        razao_social: ''
       });
     } catch (error) {
       console.error('Erro ao criar ativo:', error);
     }
+  };
+
+  const onGridReady = params => {
+    params.api.sizeColumnsToFit();
+  };
+
+  const handleRowSelection = (event) => {
+    const selectedNode = event.api.getSelectedNodes()[0];
+    const selectedData = selectedNode.data;
+    setFormData({
+      ...formData,
+      codigo_cliente: selectedData.codigo,
+      razao_social: selectedData.nome_razao_social
+    });
+    setShowModal(false);
+  };
+
+  const columnDefs = [
+    { headerName: 'Código', field: 'codigo', checkboxSelection: true },
+    { headerName: 'Razão Social', field: 'nome_razao_social', filter: 'agTextColumnFilter' },
+    { headerName: 'Documento', field: 'documento' },
+    { headerName: 'Cidade', field: 'cidade' }
+  ];
+
+  const localeText = {
+    // Traduções de filtro
+    filterOoo: 'Filtrar...',
+    equals: 'Igual a',
+    notEqual: 'Diferente de',
+    contains: 'Contém',
+    notContains: 'Não contém',
+    startsWith: 'Começa com',
+    endsWith: 'Termina com',
+    // Outros textos
+    loadingOoo: 'Carregando...',
+    noRowsToShow: 'Nenhuma linha para mostrar',
+    // Menu de colunas
+    pinColumn: 'Fixar Coluna',
+    valueAggregation: 'Agregação de Valor',
+    autosizeThiscolumn: 'Autoajustar Esta Coluna',
+    autosizeAllColumns: 'Autoajustar Todas as Colunas',
+    resetColumns: 'Redefinir Colunas',
+    expandAll: 'Expandir Tudo',
+    collapseAll: 'Recolher Tudo',
+    // Tool Panel
+    toolPanel: 'Painel de Ferramentas',
+    columns: 'Colunas',
+    filters: 'Filtros',
+    rowGroupColumnsEmptyMessage: 'Arraste colunas para agrupar',
+    valueColumnsEmptyMessage: 'Arraste colunas para valores',
+    pivotMode: 'Modo Pivô',
+    groups: 'Grupos',
+    values: 'Valores',
+    pivots: 'Pivôs',
+    // Outros textos de UI
+    copy: 'Copiar',
+    copyWithHeaders: 'Copiar com Cabeçalhos',
+    ctrlC: 'Ctrl+C',
+    paste: 'Colar',
+    ctrlV: 'Ctrl+V',
   };
 
   return (
@@ -75,13 +172,20 @@ const CadBasCriarAtivo = () => {
       <h2>Criar Ativo</h2>
       <Form onSubmit={handleSubmit}>
         <Form.Group>
-          <Form.Label>Código do Cliente</Form.Label>
-          <Form.Control
-            type="text"
-            name="codigo_cliente"
-            value={formData.codigo_cliente}
-            onChange={handleChange}
-          />
+          <Form.Label>Parceiro de Negócio (Cliente)</Form.Label>
+          <div className="d-flex align-items-center">
+            <Form.Control
+              type="text"
+              name="razao_social"
+              value={formData.razao_social}
+              readOnly
+              style={{ flex: 1 }}
+            />
+            <Button onClick={() => setShowModal(true)} className="ml-2 d-flex align-items-center">
+              <FaSearch className="mr-1" />
+              Buscar Parceiro
+            </Button>
+          </div>
         </Form.Group>
         <Form.Group>
           <Form.Label>Número de Série</Form.Label>
@@ -160,19 +264,46 @@ const CadBasCriarAtivo = () => {
             onChange={handleChange}
           />
         </Form.Group>
-        <Form.Group>
-          <Form.Label>Código da Empresa</Form.Label>
-          <Form.Control
-            type="text"
-            name="codigo_empresa"
-            value={formData.codigo_empresa}
-            onChange={handleChange}
-          />
-        </Form.Group>
         <Button type="submit" className="mt-3">
           Criar
         </Button>
       </Form>
+
+      {/* Modal com a ag-Grid para seleção do parceiro de negócio */}
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        dialogClassName="custom-modal"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Selecionar Parceiro de Negócio</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="ag-theme-alpine" style={{ height: '100%', width: '100%' }}>
+            <AgGridReact
+              rowSelection="single"
+              onRowSelected={handleRowSelection}
+              columnDefs={columnDefs}
+              rowData={parceiros}
+              onGridReady={onGridReady}
+              localeText={localeText}
+              defaultColDef={{
+                flex: 1,
+                minWidth: 100,
+                filter: true,
+                floatingFilter: true,
+                resizable: true,
+              }}
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancelar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

@@ -1,0 +1,18 @@
+/* CadBasCriarAtivo.css */
+
+.custom-modal .modal-dialog {
+    width: 90% !important;
+    max-width: 90% !important;
+    margin: auto !important;
+  }
+  
+  .custom-modal .modal-content {
+    height: 90vh !important;
+    max-height: 90vh !important;
+  }
+  
+  .custom-modal .modal-body {
+    overflow-y: auto;
+    height: calc(100% - 56px - 56px); /* Altura total menos as alturas do header e footer */
+  }
+  
