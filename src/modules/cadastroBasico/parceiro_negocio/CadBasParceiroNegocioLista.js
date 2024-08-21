@@ -3,6 +3,8 @@ import { Container, ListGroup, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const CadBasParceiroNegocioLista = () => {
   const [parceiros, setParceiros] = useState([]);
   const navigate = useNavigate();
@@ -10,7 +12,7 @@ const CadBasParceiroNegocioLista = () => {
   useEffect(() => {
     const fetchParceiros = async () => {
       try {
-        const response = await axios.get('http://localhost:3042/api/parceiros');
+        const response = await axios.get(`${API_URL}/parceiros`);
         setParceiros(response.data);
       } catch (error) {
         console.error('Error fetching parceiros:', error);
@@ -22,7 +24,12 @@ const CadBasParceiroNegocioLista = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3042/api/parceiros/${id}`);
+      const token = localStorage.getItem('token'); // Supondo que o token esteja armazenado no localStorage
+      await axios.delete(`${API_URL}/parceiros/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setParceiros(parceiros.filter(parceiro => parceiro.codigo !== id));
     } catch (error) {
       console.error('Error deleting parceiro:', error);
