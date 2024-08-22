@@ -3,6 +3,9 @@ import { Container, ListGroup, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+//TODO - mudar o nome do botão "editar" para detalhes
+//TODO - Na página detalhes, servirá tanto como exibição, como também edição
+
 const API_URL = process.env.REACT_APP_API_URL;
 
 const CadBasParceiroNegocioLista = () => {

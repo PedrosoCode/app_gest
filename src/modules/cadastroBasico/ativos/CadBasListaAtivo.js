@@ -1,22 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { Container, ListGroup } from 'react-bootstrap';
+import { Container, ListGroup, Button } from 'react-bootstrap';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const CadBasListaAtivo = () => {
   const [ativos, setAtivos] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAtivos = async () => {
-      const response = await axios.get('http://localhost:3042/api/ativos');
-      setAtivos(response.data);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('Token não encontrado');
+          return;
+        }
+
+        const response = await axios.get('http://localhost:3042/api/ativos', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setAtivos(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar ativos:', error);
+      }
     };
 
     fetchAtivos();
   }, []);
-
-
-  //TODO - vincular fotos aos ativos
-  //FIXME - atualizar o metodo de delete
 
   return (
     <Container>
@@ -25,6 +37,9 @@ const CadBasListaAtivo = () => {
         {ativos.map((ativo) => (
           <ListGroup.Item key={ativo.codigo}>
             {ativo.numero_serie} - {ativo.modelo}
+            <Button variant="info" className="float-end" onClick={() => navigate(`/ativos/atualizar/${ativo.codigo}`)}>
+              DETALHES
+            </Button>
           </ListGroup.Item>
         ))}
       </ListGroup>

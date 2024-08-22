@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form, Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from 'jwt-decode'; 
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { FaSearch } from 'react-icons/fa';
 import './CadBasCriarAtivo.css';
 
-//FIXME - Fazer fucionar o envio para o banco 
 //TODO - Separar a lógica da grid de parceiro de negócio em um componente separado para reutilização 
 //REVIEW - Verificar uma forma de estilizar melhor a grid
 
@@ -78,13 +77,18 @@ const CadBasCriarAtivo = () => {
     e.preventDefault();
 
     const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    }
+
     const decodedToken = jwtDecode(token);
-    const codigo_empresa = decodedToken.codigo_empresa; // Extrair o código da empresa do JWT
+    const codigo_empresa = decodedToken.codigo_empresa;
 
     try {
       await axios.post('http://localhost:3042/api/ativos', {
         ...formData,
-        codigo_empresa // Adicionar o código da empresa automaticamente
+        codigo_empresa
       }, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -113,12 +117,14 @@ const CadBasCriarAtivo = () => {
 
   const handleRowSelection = (event) => {
     const selectedNode = event.api.getSelectedNodes()[0];
-    const selectedData = selectedNode.data;
-    setFormData({
-      ...formData,
-      codigo_cliente: selectedData.codigo,
-      razao_social: selectedData.nome_razao_social
-    });
+    if (selectedNode) {
+      const selectedData = selectedNode.data;
+      setFormData({
+        ...formData,
+        codigo_cliente: selectedData.codigo,
+        razao_social: selectedData.nome_razao_social
+      });
+    }
     setShowModal(false);
   };
 
