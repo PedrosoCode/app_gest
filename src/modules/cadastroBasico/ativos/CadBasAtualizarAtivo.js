@@ -22,6 +22,7 @@ const CadBasAtualizarAtivo = () => {
     nivel_manutencao: false,
     razao_social: '' // Campo para exibir o nome do cliente
   });
+  const [originalData, setOriginalData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [tecnicos, setTecnicos] = useState([]);
   const [prioridades, setPrioridades] = useState([]);
@@ -45,7 +46,6 @@ const CadBasAtualizarAtivo = () => {
 
         const ativo = response.data;
 
-        // Agora precisamos buscar o nome do cliente (parceiro de negócio) usando o código_cliente
         const clienteResponse = await axios.get(`http://localhost:3042/api/parceiros/${ativo.codigo_cliente}`, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -54,10 +54,13 @@ const CadBasAtualizarAtivo = () => {
 
         const cliente = clienteResponse.data;
 
-        setFormData({
+        const fullData = {
           ...ativo,
           razao_social: cliente.nome_razao_social // Preencher a razão social do cliente
-        });
+        };
+
+        setFormData(fullData);
+        setOriginalData(fullData); // Salva os dados originais
       } catch (error) {
         console.error('Erro ao buscar ativo:', error);
       }
@@ -120,11 +123,11 @@ const CadBasAtualizarAtivo = () => {
       }
 
       const decodedToken = jwtDecode(token);
-      const codigo_empresa = decodedToken.codigo_empresa; // Extraia o código da empresa do JWT
+      const codigo_empresa = decodedToken.codigo_empresa;
 
       await axios.put(`http://localhost:3042/api/ativos/${id}`, {
         ...formData,
-        codigo_empresa // Adicione o código da empresa automaticamente
+        codigo_empresa
       }, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -155,6 +158,11 @@ const CadBasAtualizarAtivo = () => {
     }
   };
 
+  const handleCancel = () => {
+    setFormData(originalData); // Restaura os dados originais
+    setIsEditing(false); // Sai do modo de edição
+  };
+
   const onGridReady = params => {
     params.api.sizeColumnsToFit();
   };
@@ -166,7 +174,7 @@ const CadBasAtualizarAtivo = () => {
       setFormData({
         ...formData,
         codigo_cliente: selectedData.codigo,
-        razao_social: selectedData.nome_razao_social // Preenche o campo de razão social
+        razao_social: selectedData.nome_razao_social
       });
     }
     setShowModal(false);
@@ -324,6 +332,9 @@ const CadBasAtualizarAtivo = () => {
           <>
             <Button type="submit" className="mt-3">
               Salvar
+            </Button>
+            <Button variant="secondary" className="mt-3 ms-3" onClick={handleCancel}>
+              Cancelar
             </Button>
             <Button variant="danger" className="mt-3 ms-3" onClick={handleDelete}>
               Deletar
