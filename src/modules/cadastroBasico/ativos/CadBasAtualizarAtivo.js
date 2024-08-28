@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; 
-import { FaSearch } from 'react-icons/fa';
+import { jwtDecode } from 'jwt-decode';
+import { FaSearch, FaTrash } from 'react-icons/fa';
 import CompGridClienteSelecao from '../../../components/CompGridClienteSelecao'; // Importe o componente
 
 const CadBasAtualizarAtivo = () => {
@@ -25,6 +25,10 @@ const CadBasAtualizarAtivo = () => {
   const [tecnicos, setTecnicos] = useState([]);
   const [prioridades, setPrioridades] = useState([]);
   const [showModal, setShowModal] = useState(false);
+
+  // Estados adicionais para gerenciamento de fotos
+  const [fotos, setFotos] = useState([]);
+  const [newFotos, setNewFotos] = useState([]);
 
   useEffect(() => {
     const fetchAtivo = async () => {
@@ -58,6 +62,16 @@ const CadBasAtualizarAtivo = () => {
 
         setFormData(fullData);
         setOriginalData(fullData); // Salva os dados originais
+
+        // Fetch fotos associadas ao ativo
+        const fotosResponse = await axios.get(`http://localhost:3042/api/ativos/${id}/fotos`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        setFotos(fotosResponse.data); // Definir as fotos existentes
+
       } catch (error) {
         console.error('Erro ao buscar ativo:', error);
       }
@@ -154,6 +168,69 @@ const CadBasAtualizarAtivo = () => {
       codigo_cliente: selectedData.codigo,
       razao_social: selectedData.nome_razao_social // Preenche o campo de razão social
     });
+  };
+
+  // Função para gerenciar seleção de fotos para upload
+  const handleFileChange = (e) => {
+    setNewFotos([...newFotos, ...e.target.files]); // Adiciona fotos para upload
+  };
+
+  // Função para fazer upload de fotos
+  const handleFotoUpload = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Token não encontrado');
+        return;
+      }
+
+      const formData = new FormData();
+      newFotos.forEach((foto) => {
+        formData.append('fotos', foto);
+      });
+
+      await axios.post(`http://localhost:3042/api/ativos/${id}/fotos`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      // Atualiza a lista de fotos após upload
+      const fotosResponse = await axios.get(`http://localhost:3042/api/ativos/${id}/fotos`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setFotos(fotosResponse.data);
+      setNewFotos([]); // Limpa as novas fotos após o upload
+
+    } catch (error) {
+      console.error('Erro ao fazer upload de fotos:', error);
+    }
+  };
+
+  // Função para deletar fotos
+  const handleFotoDelete = async (fotoId) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('Token não encontrado');
+        return;
+      }
+
+      await axios.delete(`http://localhost:3042/api/ativos/${id}/fotos/${fotoId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      // Atualiza a lista de fotos após exclusão
+      setFotos(fotos.filter((foto) => foto.codigo !== fotoId));
+
+    } catch (error) {
+      console.error('Erro ao deletar foto:', error);
+    }
   };
 
   return (
@@ -264,6 +341,40 @@ const CadBasAtualizarAtivo = () => {
             disabled={!isEditing}
           />
         </Form.Group>
+
+        {/* Campo de upload de fotos */}
+        <Form.Group>
+          <Form.Label>Fotos do Ativo</Form.Label>
+          <Form.Control
+            type="file"
+            multiple
+            onChange={handleFileChange}
+            disabled={!isEditing}
+          />
+          <Button 
+            className="mt-2"
+            onClick={handleFotoUpload}
+            disabled={!isEditing || newFotos.length === 0}
+          >
+            Upload Fotos
+          </Button>
+        </Form.Group>
+
+        {/* Lista de fotos existentes */}
+        <div className="mt-3">
+          {fotos.map((foto) => (
+            <div key={foto.codigo} className="mb-2">
+              <img src={`http://localhost:3042${foto.caminho_completo}`} alt={foto.titulo} width="100" />
+              <p>{foto.descricao}</p>
+              {isEditing && (
+                <Button variant="danger" onClick={() => handleFotoDelete(foto.codigo)}>
+                  <FaTrash /> Excluir
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+
         {isEditing ? (
           <>
             <Button type="submit" className="mt-3">

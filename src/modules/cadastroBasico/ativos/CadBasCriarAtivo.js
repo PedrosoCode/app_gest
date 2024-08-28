@@ -10,6 +10,8 @@ import './CadBasCriarAtivo.css';
 
 //TODO - Separar a lógica da grid de parceiro de negócio em um componente separado para reutilização 
 //REVIEW - Verificar uma forma de estilizar melhor a grid
+//TODO - Mudar grid para ser consumida via componente e não direto no arquivo 
+//TODO - Permitir inserir imagens também no momento de cadastro do ativo
 
 const CadBasCriarAtivo = () => {
   const [formData, setFormData] = useState({

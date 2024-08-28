@@ -5,6 +5,8 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import axios from 'axios';
 
+//TODO - Trocar link por variável de ambiente
+
 const CompGridClienteSelecao = ({ show, onHide, onSelectCliente, isEditing }) => {
   const [parceiros, setParceiros] = useState([]);
 
