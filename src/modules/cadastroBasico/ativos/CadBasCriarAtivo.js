@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Form, Button, Modal } from 'react-bootstrap';
+import { Container, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode'; 
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { FaSearch } from 'react-icons/fa';
 import './CadBasCriarAtivo.css';
+import CompGridClienteSelecao from '../../../components/CompGridClienteSelecao';
 
 //TODO - Separar a lógica da grid de parceiro de negócio em um componente separado para reutilização 
 //REVIEW - Verificar uma forma de estilizar melhor a grid
@@ -28,7 +26,6 @@ const CadBasCriarAtivo = () => {
 
   const [tecnicos, setTecnicos] = useState([]);
   const [prioridades, setPrioridades] = useState([]);
-  const [parceiros, setParceiros] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -53,18 +50,6 @@ const CadBasCriarAtivo = () => {
       }
     };
     fetchPrioridades();
-  }, []);
-
-  useEffect(() => {
-    const fetchParceiros = async () => {
-      try {
-        const response = await axios.get('http://localhost:3042/api/parceiros');
-        setParceiros(response.data);
-      } catch (error) {
-        console.error('Erro ao buscar parceiros de negócio:', error);
-      }
-    };
-    fetchParceiros();
   }, []);
 
   const handleChange = (e) => {
@@ -111,68 +96,6 @@ const CadBasCriarAtivo = () => {
     } catch (error) {
       console.error('Erro ao criar ativo:', error);
     }
-  };
-
-  const onGridReady = params => {
-    params.api.sizeColumnsToFit();
-  };
-
-  const handleRowSelection = (event) => {
-    const selectedNode = event.api.getSelectedNodes()[0];
-    if (selectedNode) {
-      const selectedData = selectedNode.data;
-      setFormData({
-        ...formData,
-        codigo_cliente: selectedData.codigo,
-        razao_social: selectedData.nome_razao_social
-      });
-    }
-    setShowModal(false);
-  };
-
-  const columnDefs = [
-    { headerName: 'Código', field: 'codigo', checkboxSelection: true },
-    { headerName: 'Razão Social', field: 'nome_razao_social', filter: 'agTextColumnFilter' },
-    { headerName: 'Documento', field: 'documento' },
-    { headerName: 'Cidade', field: 'cidade' }
-  ];
-
-  const localeText = {
-    // Traduções de filtro
-    filterOoo: 'Filtrar...',
-    equals: 'Igual a',
-    notEqual: 'Diferente de',
-    contains: 'Contém',
-    notContains: 'Não contém',
-    startsWith: 'Começa com',
-    endsWith: 'Termina com',
-    // Outros textos
-    loadingOoo: 'Carregando...',
-    noRowsToShow: 'Nenhuma linha para mostrar',
-    // Menu de colunas
-    pinColumn: 'Fixar Coluna',
-    valueAggregation: 'Agregação de Valor',
-    autosizeThiscolumn: 'Autoajustar Esta Coluna',
-    autosizeAllColumns: 'Autoajustar Todas as Colunas',
-    resetColumns: 'Redefinir Colunas',
-    expandAll: 'Expandir Tudo',
-    collapseAll: 'Recolher Tudo',
-    // Tool Panel
-    toolPanel: 'Painel de Ferramentas',
-    columns: 'Colunas',
-    filters: 'Filtros',
-    rowGroupColumnsEmptyMessage: 'Arraste colunas para agrupar',
-    valueColumnsEmptyMessage: 'Arraste colunas para valores',
-    pivotMode: 'Modo Pivô',
-    groups: 'Grupos',
-    values: 'Valores',
-    pivots: 'Pivôs',
-    // Outros textos de UI
-    copy: 'Copiar',
-    copyWithHeaders: 'Copiar com Cabeçalhos',
-    ctrlC: 'Ctrl+C',
-    paste: 'Colar',
-    ctrlV: 'Ctrl+V',
   };
 
   return (
@@ -277,41 +200,18 @@ const CadBasCriarAtivo = () => {
         </Button>
       </Form>
 
-      {/* Modal com a ag-Grid para seleção do parceiro de negócio */}
-      <Modal
+      {/* Uso do componente CompGridClienteSelecao */}
+      <CompGridClienteSelecao
         show={showModal}
         onHide={() => setShowModal(false)}
-        centered
-        dialogClassName="custom-modal"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Selecionar Parceiro de Negócio</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="ag-theme-alpine" style={{ height: '100%', width: '100%' }}>
-            <AgGridReact
-              rowSelection="single"
-              onRowSelected={handleRowSelection}
-              columnDefs={columnDefs}
-              rowData={parceiros}
-              onGridReady={onGridReady}
-              localeText={localeText}
-              defaultColDef={{
-                flex: 1,
-                minWidth: 100,
-                filter: true,
-                floatingFilter: true,
-                resizable: true,
-              }}
-            />
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Cancelar
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        onSelectCliente={(selectedData) => {
+          setFormData({
+            ...formData,
+            codigo_cliente: selectedData.codigo,
+            razao_social: selectedData.nome_razao_social
+          });
+        }}
+      />
     </Container>
   );
 };
