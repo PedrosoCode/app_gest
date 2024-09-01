@@ -23,8 +23,10 @@ import CadBasParceiroNegocioLista from './modules/cadastroBasico/parceiro_negoci
 import CadBasParceiroNegocioCriar from './modules/cadastroBasico/parceiro_negocio/CadBasParceiroNegocioCriar';
 
 import Teste from './modules/paginasCapa/Teste';
+import EstoqueCriarItem from './modules/estoque/EstoqueCriarItem';
 
 //TODO - Variável de ambiente para o link da API ao invés de setar fixo
+//TODO - Feature de seleção de tabela de preços
 
 const App = () => {
   return (
@@ -45,6 +47,7 @@ const App = () => {
         <Route path="/protected" element={<RotaProtegida> <PaginaProtegida /> </RotaProtegida>} />
         <Route path="/parceiro-lista" element={<CadBasParceiroNegocioLista />} />
         <Route path="/parceiro-criar" element={<CadBasParceiroNegocioCriar />} />
+        <Route path="/Estoque-criar-item" element={<EstoqueCriarItem />} />
       </Routes>
     </Router>
   );

@@ -6,6 +6,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import axios from 'axios';
 
 //TODO - Trocar link por variável de ambiente
+//TODO - verificar uma forma de que o form que chama esse componente, especifique a procedure a ser usada
 
 const CompGridClienteSelecao = ({ show, onHide, onSelectCliente, isEditing }) => {
   const [parceiros, setParceiros] = useState([]);

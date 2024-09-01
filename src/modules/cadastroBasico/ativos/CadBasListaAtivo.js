@@ -38,7 +38,7 @@ const CadBasListaAtivo = () => {
           <ListGroup.Item key={ativo.codigo}>
             {ativo.numero_serie} - {ativo.modelo}
             <Button variant="info" className="float-end" onClick={() => navigate(`/ativos/atualizar/${ativo.codigo}`)}>
-              DETALHES
+              Informações de cadastro
             </Button>
           </ListGroup.Item>
         ))}
