@@ -36,7 +36,7 @@ const EstoqueCriarItem = () => {
     const codigo_empresa = decodedToken.codigo_empresa;
 
     try {
-      await axios.post('http://localhost:3042/api/estoque', {
+      await axios.post('http://localhost:3042/api/item', {
         ...formData,
         codigo_empresa
       }, {

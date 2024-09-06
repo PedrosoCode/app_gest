@@ -24,6 +24,7 @@ import CadBasParceiroNegocioCriar from './modules/cadastroBasico/parceiro_negoci
 
 import Teste from './modules/paginasCapa/Teste';
 import EstoqueCriarItem from './modules/estoque/EstoqueCriarItem';
+import CriarOrdemServico from './modules/ordemServico/CriarOrdemServico';
 
 //TODO - Variável de ambiente para o link da API ao invés de setar fixo
 //TODO - Feature de seleção de tabela de preços
@@ -48,6 +49,7 @@ const App = () => {
         <Route path="/parceiro-lista" element={<CadBasParceiroNegocioLista />} />
         <Route path="/parceiro-criar" element={<CadBasParceiroNegocioCriar />} />
         <Route path="/Estoque-criar-item" element={<EstoqueCriarItem />} />
+        <Route path="/ordem-servico-criar" element={<CriarOrdemServico />} />
       </Routes>
     </Router>
   );

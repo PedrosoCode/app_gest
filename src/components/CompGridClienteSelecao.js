@@ -14,7 +14,21 @@ const CompGridClienteSelecao = ({ show, onHide, onSelectCliente, isEditing }) =>
   useEffect(() => {
     const fetchParceiros = async () => {
       try {
-        const response = await axios.get('http://localhost:3042/api/parceiros');
+        // Obtém o token JWT armazenado (geralmente no localStorage)
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          console.error('Token não encontrado');
+          return;
+        }
+  
+        // Faz a requisição com o token no cabeçalho Authorization
+        const response = await axios.get('http://localhost:3042/api/parceiros', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+  
         setParceiros(response.data);
       } catch (error) {
         console.error('Erro ao buscar parceiros de negócio:', error);
