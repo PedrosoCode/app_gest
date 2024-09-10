@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode'; 
-import { FaSearch } from 'react-icons/fa';
+import { FaSearch, FaPlus } from 'react-icons/fa';
 import CompGridClienteSelecao from '../../components/CompGridClienteSelecao';
 import CompGridAtivoSelecao from '../../components/CompGridAtivoSelecao';
+import CompGridItemSelecao from './CompGridItemSelecao';
 
 //TODO - grid para inserção de itens na OS
 //FIXME - Modal de seleção do ativo com base no codigo do parceiro de negócio ainda não está funcionando
@@ -20,6 +21,7 @@ const CriarOrdemServico = () => {
 
   const [showClienteModal, setShowClienteModal] = useState(false);
   const [showAtivoModal, setShowAtivoModal] = useState(false);
+  const [showItemModal, setShowItemModal] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -115,6 +117,11 @@ const CriarOrdemServico = () => {
         <Button type="submit" className="mt-3">
           Criar Ordem de Serviço
         </Button>
+
+        <Button variant="primary" className="mt-3 ml-3 d-flex align-items-center" onClick={() => setShowItemModal(true)}>
+          <FaPlus className="mr-1" />
+          Adicionar Item
+        </Button>
       </Form>
 
       <CompGridClienteSelecao
@@ -126,21 +133,29 @@ const CriarOrdemServico = () => {
             codigo_cliente: selectedData.codigo,
             razao_social: selectedData.nome_razao_social
           });
-          setShowClienteModal(false); // Fecha o modal após seleção
+          setShowClienteModal(false);
         }}
       />
 
       <CompGridAtivoSelecao
         show={showAtivoModal}
         onHide={() => setShowAtivoModal(false)}
-        codigoCliente={formData.codigo_cliente} // Passa o código do cliente para o componente de seleção de ativos
+        codigoCliente={formData.codigo_cliente}
         onSelectAtivo={(selectedData) => {
           setFormData({
             ...formData,
             codigo_ativo: selectedData.codigo,
             descricao_ativo: selectedData.modelo
           });
-          setShowAtivoModal(false); // Fecha o modal após seleção
+          setShowAtivoModal(false);
+        }}
+      />
+
+      <CompGridItemSelecao
+        show={showItemModal}
+        onHide={() => setShowItemModal(false)}
+        onSelectItem={(selectedItem) => {
+          console.log('Item selecionado:', selectedItem);
         }}
       />
     </Container>
