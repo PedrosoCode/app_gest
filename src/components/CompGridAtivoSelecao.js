@@ -10,38 +10,54 @@ import axios from 'axios';
 const CompGridAtivoSelecao = ({ show, onHide, onSelectAtivo, codigoCliente }) => {
   const [ativos, setAtivos] = useState([]);
 
-  useEffect(() => {
-    // Só faz a requisição se houver um cliente selecionado
-    const fetchAtivos = async () => {
-      if (!codigoCliente) {
-        setAtivos([]); // Limpa a lista se nenhum cliente for selecionado
-        return;
-      }
+  const fetchAtivos = async (codigoCliente) => {
+    if (!codigoCliente) return;
 
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          console.error('Token não encontrado');
-          return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:3042/api/ordem-servico/ativos/${codigoCliente}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
+      });
 
-        const response = await axios.get(`http://localhost:3042/api/ativos/${codigoCliente}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+      // Garante que o valor é um array, mesmo que a API não retorne um array
+      const data = Array.isArray(response.data) ? response.data : [];
+      setAtivos(data); // Atualiza a lista de ativos com um array
+    } catch (error) {
+      console.error('Erro ao buscar ativos:', error);
+      setAtivos([]); // Garante que a lista será um array vazio em caso de erro
+    }
+  };
 
-        // Verifica se a resposta é um array e define os ativos
-        const data = Array.isArray(response.data) ? response.data : [];
-        setAtivos(data);
-      } catch (error) {
-        console.error('Erro ao buscar ativos:', error);
-        setAtivos([]); // Limpa a lista em caso de erro
-      }
-    };
+  // useEffect que dispara quando o codigoCliente ou o show mudam
+  useEffect(() => {
+    if (show && codigoCliente) {
+      fetchAtivos(codigoCliente);
+    }
+  }, [codigoCliente, show]);
 
-    fetchAtivos();
-  }, [codigoCliente]); // Recarrega os ativos sempre que o código do cliente mudar
+  const columnDefs = [
+    { headerName: 'Código', field: 'codigo', checkboxSelection: true, width: 100 },
+    { headerName: 'Número de Série', field: 'numero_serie', filter: 'agTextColumnFilter', width: 150 },
+    { headerName: 'Modelo', field: 'modelo', filter: 'agTextColumnFilter', width: 150 },
+    { headerName: 'Prioridade', field: 'codigo_prioridade', width: 120 },
+    { headerName: 'Técnico Responsável', field: 'codigo_tecnico_responsavel', width: 180 },
+    { headerName: 'Observação', field: 'observacao', width: 200 }
+  ];
+
+  const defaultColDef = {
+    flex: 1,
+    minWidth: 100,
+    filter: true,
+    floatingFilter: true,
+    resizable: true,
+  };
 
   const handleRowSelection = (event) => {
     const selectedNode = event.api.getSelectedNodes()[0];
@@ -52,22 +68,13 @@ const CompGridAtivoSelecao = ({ show, onHide, onSelectAtivo, codigoCliente }) =>
     onHide(); // Fecha o modal após a seleção
   };
 
-  const columnDefs = [
-    { headerName: 'Código', field: 'codigo', checkboxSelection: true },
-    { headerName: 'Número de Série', field: 'numero_serie', filter: 'agTextColumnFilter' },
-    { headerName: 'Modelo', field: 'modelo', filter: 'agTextColumnFilter' },
-    { headerName: 'Prioridade', field: 'codigo_prioridade' },
-    { headerName: 'Técnico Responsável', field: 'codigo_tecnico_responsavel' },
-    { headerName: 'Observação', field: 'observacao' }
-  ];
-
   return (
     <Modal
       show={show}
       onHide={onHide}
       centered
-      dialogClassName="w-100 mw-100" // Classe CSS para largura total
-      style={{ maxWidth: '100%' }} // Estilo inline para garantir a largura total
+      dialogClassName="w-100 mw-100"
+      style={{ maxWidth: '100%' }}
     >
       <Modal.Header closeButton>
         <Modal.Title>Selecionar Ativo</Modal.Title>
@@ -79,13 +86,7 @@ const CompGridAtivoSelecao = ({ show, onHide, onSelectAtivo, codigoCliente }) =>
             onRowSelected={handleRowSelection}
             columnDefs={columnDefs}
             rowData={ativos} // rowData será os ativos filtrados pelo cliente
-            defaultColDef={{
-              flex: 1,
-              minWidth: 100,
-              filter: true,
-              floatingFilter: true,
-              resizable: true,
-            }}
+            defaultColDef={defaultColDef}
           />
         </div>
       </Modal.Body>

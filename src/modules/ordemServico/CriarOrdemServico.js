@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode'; 
@@ -51,6 +51,7 @@ const CriarOrdemServico = () => {
         }
       });
 
+      // Limpa o formulário após o envio
       setFormData({
         codigo_cliente: '',
         codigo_ativo: '',
@@ -116,7 +117,6 @@ const CriarOrdemServico = () => {
         </Button>
       </Form>
 
-      {/* Uso do componente CompGridClienteSelecao */}
       <CompGridClienteSelecao
         show={showClienteModal}
         onHide={() => setShowClienteModal(false)}
@@ -126,20 +126,21 @@ const CriarOrdemServico = () => {
             codigo_cliente: selectedData.codigo,
             razao_social: selectedData.nome_razao_social
           });
+          setShowClienteModal(false); // Fecha o modal após seleção
         }}
       />
 
-      {/* Uso do componente CompGridAtivoSelecao */}
       <CompGridAtivoSelecao
         show={showAtivoModal}
         onHide={() => setShowAtivoModal(false)}
-        codigoCliente={formData.codigo_cliente} // Filtra os ativos pelo cliente selecionado
+        codigoCliente={formData.codigo_cliente} // Passa o código do cliente para o componente de seleção de ativos
         onSelectAtivo={(selectedData) => {
           setFormData({
             ...formData,
             codigo_ativo: selectedData.codigo,
             descricao_ativo: selectedData.modelo
           });
+          setShowAtivoModal(false); // Fecha o modal após seleção
         }}
       />
     </Container>
