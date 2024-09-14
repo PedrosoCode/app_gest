@@ -41,7 +41,7 @@ const CriarOrdemServico = () => {
   
     try {
       // 1. Enviar a OS para o endpoint principal
-      await axios.post(`${API_URL}/ordem-servico/criar_os`, {
+     const response = await axios.post(`${API_URL}/ordem-servico/criar_os`, {
         ...formData,
         codigo_empresa
       }, {
@@ -49,25 +49,23 @@ const CriarOrdemServico = () => {
           Authorization: `Bearer ${token}`
         }
       });
+      const { codigo_ordem_servico } = response.data; 
 
-
-      // const { codigo_ordem_servico } = response.data; // Supondo que o código da OS retornada está aqui
-
-      // // 2. Fazer um loop para enviar cada item da OS
-      // await Promise.all(
-      //   itensSelecionados.map((item) =>
-      //     axios.post('http://localhost:3042/api/ordem-servico/item', {
-      //       codigo_ordem_servico, // Usa o código retornado da OS
-      //       codigo_item: item.codigo,
-      //       quantidade: item.quantidade,
-      //       valor_unitario: item.valor_unitario
-      //     }, {
-      //       headers: {
-      //         Authorization: `Bearer ${token}`
-      //       }
-      //     })
-      //   )
-      // );
+      // 2. Fazer um loop para enviar cada item da OS
+      await Promise.all(
+        itensSelecionados.map((item) =>
+          axios.post(`${API_URL}/ordem-servico/criar_os/inserir_item`, {
+            codigo_ordem_servico, 
+            codigo_item: item.codigo,
+            quantidade_item: item.quantidade,
+            valor_unitario: item.valor_unitario
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          })
+        )
+      );
 
       console.log('Ordem de Serviço e itens salvos com sucesso!');
     } catch (error) {
