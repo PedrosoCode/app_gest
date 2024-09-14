@@ -162,6 +162,8 @@ const CriarOrdemServico = () => {
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
+  const isSalvarOsDisabled = !formData.codigo_cliente || !formData.codigo_ativo;
+
   return (
     <Container>
       <h2>Criar Ordem de Serviço</h2>
@@ -214,7 +216,14 @@ const CriarOrdemServico = () => {
           <FaPlus className="mr-1" />
           Adicionar Item
         </Button>
-        <Button variant="success" className="mt-3 ml-3" onClick={salvarOrdemServico}>
+
+        {/* Validação do botão Salvar OS */}
+        <Button 
+          variant="success" 
+          className="mt-3 ml-3" 
+          onClick={salvarOrdemServico} 
+          disabled={isSalvarOsDisabled} // Desabilitado se o ativo e o cliente não foram selecionados
+        >
           Salvar OS
         </Button>
       </Form>
