@@ -3,6 +3,7 @@ import { Modal, Button } from 'react-bootstrap';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 
 const CompGridItemSelecao = ({ show, onHide, onSelectItem }) => {
